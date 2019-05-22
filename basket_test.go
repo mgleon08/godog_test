@@ -1,6 +1,9 @@
 package main
 
-import "github.com/DATA-DOG/godog"
+import (
+	"fmt"
+	"github.com/DATA-DOG/godog"
+)
 
 type shopping struct {
 	shelf *Shelf
@@ -17,14 +20,27 @@ func (sh *shopping) addToBasket(productName string) (err error) {
 	return
 }
 
-func iShouldHaveProductsInTheBasket(arg1 int) error {
-	return godog.ErrPending
+func (sh *shopping) iShouldHaveProductsInTheBasket(productCount int) error {
+	if sh.basket.GetBasketSize() != productCount {
+		return fmt.Errorf(
+			"expected %d products but there are %d",
+			sh.basket.GetBasketSize(),
+			productCount,
+		)
+	}
+	return nil
 }
 
-func theOverallBasketPriceShouldBe(arg1 int) error {
-	return godog.ErrPending
+func (sh *shopping) theOverallBasketPriceShouldBe(basketTotal float64) error {
+	if sh.basket.GetBasketTotal() != basketTotal {
+		return fmt.Errorf(
+			"expected basket total to be %.2f but it is %.2f",
+			basketTotal,
+			sh.basket.GetBasketTotal(),
+		)
+	}
+	return nil
 }
-
 func FeatureContext(s *godog.Suite) {
 	sh := &shopping{}
 	s.BeforeScenario(func(interface{}) {
@@ -34,6 +50,6 @@ func FeatureContext(s *godog.Suite) {
 
 	s.Step(`^there is a "([^"]*)", which costs £(\d+)$`, sh.addProduct)
 	s.Step(`^I add the "([^"]*)" to the basket$`, sh.addToBasket)
-	s.Step(`^I should have (\d+) products in the basket$`, iShouldHaveProductsInTheBasket)
-	s.Step(`^the overall basket price should be £(\d+)$`, theOverallBasketPriceShouldBe)
+	s.Step(`^I should have (\d+) products in the basket$`, sh.iShouldHaveProductsInTheBasket)
+	s.Step(`^the overall basket price should be £(\d+)$`, sh.theOverallBasketPriceShouldBe)
 }
