@@ -16,3 +16,8 @@ type Shelf struct {
 func (s *Shelf) AddProduct(productName string, price float64) {
 	s.products[productName] = price
 }
+
+// GetProductPrice retrieves the price of a product in the Shelf
+func (s *Shelf) GetProductPrice(productName string) float64 {
+	return s.products[productName]
+}
